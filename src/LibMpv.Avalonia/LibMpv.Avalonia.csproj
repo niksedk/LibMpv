@@ -1,15 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;net7.0-android</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
 		<IsAndroid>false</IsAndroid>
-		<IsAndroid Condition="'$([MSBuild]::GetTargetPlatformIdentifier($(TargetFramework)))'=='android'">true</IsAndroid>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Avalonia" Version="11.0.4" />
+		<PackageReference Include="Avalonia" Version="11.3.8" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -94,6 +94,9 @@
                             <MenuItem Header="Settings" />
                             <Separator />
                             <MenuItem Command="{Binding PlayBigBuckBunnyCommand}" Header="Play 'Big Buck Bunny'" />
+                            <MenuItem 
+                                Command="{Binding  OpenAndPlayVideoFileCommand}"
+                                Header="Open and play..." />
                         </MenuFlyout>
                     </DropDownButton.Flyout>
                 </DropDownButton>

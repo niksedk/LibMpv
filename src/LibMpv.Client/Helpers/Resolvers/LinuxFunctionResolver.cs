@@ -16,10 +16,17 @@ public class LinuxFunctionResolver : FunctionResolverBase
 
 
     protected override IntPtr LoadNativeLibrary(string libraryName) => dlopen(libraryName, RTLD_NOW);
-    protected override string[] GetSearchPaths()
-    {
-        return [""];    
-    }
+    protected override string[] GetSearchPaths() => new[] 
+    { 
+        //MpvApi.RootPath, 
+        "/lib64", 
+        "/usr/lib64", 
+        "/lib", 
+        "/usr/lib",
+        "/lib/x86_64-linux-gnu",
+        "/usr/lib/x86_64-linux-gnu",
+        "/usr/local/lib",
+    };
 
     protected override IntPtr FindFunctionPointer(IntPtr nativeLibraryHandle, string functionName) => dlsym(nativeLibraryHandle, functionName);
 

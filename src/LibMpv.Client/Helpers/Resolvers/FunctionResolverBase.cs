@@ -27,7 +27,11 @@ public abstract class FunctionResolverBase : IFunctionResolver
 
         if (functionPointer == IntPtr.Zero)
         {
-            if (throwOnError) throw new EntryPointNotFoundException($"Could not find the entrypoint for {functionName}.");
+            if (throwOnError)
+            {
+                throw new EntryPointNotFoundException($"Could not find the entrypoint for {functionName}.");
+            }
+
             return default;
         }
 
@@ -39,7 +43,10 @@ public abstract class FunctionResolverBase : IFunctionResolver
         catch (MarshalDirectiveException)
         {
             if (throwOnError)
+            {
                 throw;
+            }
+
             return default;
         }
 #else
@@ -49,11 +56,17 @@ public abstract class FunctionResolverBase : IFunctionResolver
 
     public IntPtr GetOrLoadLibrary(string libraryName, bool throwOnError)
     {
-        if (_loadedLibraries.TryGetValue(libraryName, out var ptr)) return ptr;
+        if (_loadedLibraries.TryGetValue(libraryName, out var ptr))
+        {
+            return ptr;
+        }
 
         lock (_syncRoot)
         {
-            if (_loadedLibraries.TryGetValue(libraryName, out ptr)) return ptr;
+            if (_loadedLibraries.TryGetValue(libraryName, out ptr))
+            {
+                return ptr;
+            }
 
             var dependencies = LibraryDependenciesMap[libraryName];
             dependencies.Where(n => !_loadedLibraries.ContainsKey(n) && !n.Equals(libraryName))
@@ -62,10 +75,21 @@ public abstract class FunctionResolverBase : IFunctionResolver
 
             var version = LibMpv.LibraryVersionMap[libraryName];
             var nativeLibraryName = GetNativeLibraryName(libraryName, version);
-            var libraryPath = Path.Combine(LibMpv.RootPath, nativeLibraryName);
-            ptr = LoadNativeLibrary(libraryPath);
+            
+            foreach (var path in GetSearchPaths())
+            {
+                var libraryPath = Path.Combine(path, nativeLibraryName);
+                ptr = LoadNativeLibrary(libraryPath);
+                if (ptr != IntPtr.Zero)
+                {
+                    break;
+                }
+            }
 
-            if (ptr != IntPtr.Zero) _loadedLibraries.Add(libraryName, ptr);
+            if (ptr != IntPtr.Zero)
+            {
+                _loadedLibraries.Add(libraryName, ptr);
+            }
             else if (throwOnError)
             {
                 throw new DllNotFoundException(
@@ -78,5 +102,6 @@ public abstract class FunctionResolverBase : IFunctionResolver
 
     protected abstract string GetNativeLibraryName(string libraryName, int version);
     protected abstract IntPtr LoadNativeLibrary(string libraryName);
+    protected abstract string[] GetSearchPaths();
     protected abstract IntPtr FindFunctionPointer(IntPtr nativeLibraryHandle, string functionName);
 }

@@ -15,37 +15,43 @@ public static class FunctionResolverFactory
 {
     public static LibMpvPlatformID GetPlatformId()
     {
-        switch (Environment.OSVersion.Platform)
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            case PlatformID.Win32NT:
-                return LibMpvPlatformID.Win32NT;
-            case PlatformID.Unix:
-                {
-                    var isAndroid = RuntimeInformation.IsOSPlatform(OSPlatform.Create("ANDROID"));
-                    return isAndroid  ? LibMpvPlatformID.Android : LibMpvPlatformID.Unix;
-                }
-            case PlatformID.MacOSX:
-                return LibMpvPlatformID.MacOSX;
-            default:
-                return LibMpvPlatformID.Other;
+            return LibMpvPlatformID.MacOSX;
         }
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            return LibMpvPlatformID.Win32NT;
+        }
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            var isAndroid = RuntimeInformation.IsOSPlatform(OSPlatform.Create("ANDROID"));
+            return isAndroid  ? LibMpvPlatformID.Android : LibMpvPlatformID.Unix;
+        }
+        
+        return LibMpvPlatformID.Other;
     }
 
     public static IFunctionResolver Create()
     {
-        var os = System.Environment.OSVersion;
-        switch (GetPlatformId())
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            case LibMpvPlatformID.MacOSX:
-                return new MacFunctionResolver();
-            case LibMpvPlatformID.Unix:
-                return new LinuxFunctionResolver();
-            case LibMpvPlatformID.Android:
-                return new AndroidFunctionResolver();
-            case LibMpvPlatformID.Win32NT:
-                return new WindowsFunctionResolver();
-            default:
-                throw new PlatformNotSupportedException();
+            return new MacFunctionResolver();
         }
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            return new WindowsFunctionResolver();
+        }
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            var isAndroid = RuntimeInformation.IsOSPlatform(OSPlatform.Create("ANDROID"));
+            return isAndroid ? new AndroidFunctionResolver() : new LinuxFunctionResolver();
+        }
+
+        throw new PlatformNotSupportedException();
     }
 }

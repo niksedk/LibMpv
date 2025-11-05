@@ -16,6 +16,10 @@ public class LinuxFunctionResolver : FunctionResolverBase
 
 
     protected override IntPtr LoadNativeLibrary(string libraryName) => dlopen(libraryName, RTLD_NOW);
+    protected override string[] GetSearchPaths()
+    {
+        return [""];    
+    }
 
     protected override IntPtr FindFunctionPointer(IntPtr nativeLibraryHandle, string functionName) => dlsym(nativeLibraryHandle, functionName);
 

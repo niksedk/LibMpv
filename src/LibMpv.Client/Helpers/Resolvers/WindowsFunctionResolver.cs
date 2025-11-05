@@ -9,11 +9,21 @@ public class WindowsFunctionResolver : FunctionResolverBase
 
     protected override string GetNativeLibraryName(string libraryName, int version)
     {
-        if (version > 0) return $"{libraryName}-{version}.dll";
+        if (version > 0)
+        {
+            return $"{libraryName}-{version}.dll";
+        }
+
         return $"{libraryName}.dll";
     }
 
     protected override IntPtr LoadNativeLibrary(string libraryName) => LoadLibrary(libraryName);
+
+    protected override string[] GetSearchPaths()
+    {
+        return [""];
+    }
+
     protected override IntPtr FindFunctionPointer(IntPtr nativeLibraryHandle, string functionName) => GetProcAddress(nativeLibraryHandle, functionName);
 
 
